@@ -1,0 +1,14 @@
+D:\open\SQLStatementGenerator_src\bin\Debug\SqlStatementGenerator.exe.config
+D:\open\SQLStatementGenerator_src\bin\Debug\SqlStatementGenerator.exe
+D:\open\SQLStatementGenerator_src\bin\Debug\SqlStatementGenerator.pdb
+D:\open\SQLStatementGenerator_src\bin\Debug\Microsoft.ApplicationBlocks.Data.dll
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.csproj.AssemblyReference.cache
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.csproj.SuggestedBindingRedirects.cache
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.Properties.Resources.resources
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.SelectMultipleItems.resources
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.SqlGenerator.resources
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.csproj.GenerateResource.cache
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.csproj.CoreCompileInputs.cache
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.csproj.CopyComplete
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.exe
+D:\open\SQLStatementGenerator_src\obj\Debug\SqlStatementGenerator.pdb
