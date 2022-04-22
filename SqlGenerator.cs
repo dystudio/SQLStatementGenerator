@@ -8,6 +8,7 @@ using System.Drawing;
 using System.Collections;
 using System.ComponentModel;
 using System.Windows.Forms;
+using SqlStatementGenerator.App_Code;
 
 namespace SqlStatementGenerator
 {
@@ -20,6 +21,7 @@ namespace SqlStatementGenerator
         private DataTable m_TableInfo = null;
         private string m_sSqlStatementText = string.Empty;
         private enum STATEMENT_TYPES { INSERT, UPDATE, DELETE }
+        private DatabaseType dbType = DatabaseType.Sqlserver;
 
         public SqlGenerator()
         {
@@ -34,6 +36,10 @@ namespace SqlStatementGenerator
             cmbSqlType.SelectedIndex = (int)STATEMENT_TYPES.INSERT;
 
             m_sSqlConnectionString = Convert.ToString(ConfigurationManager.AppSettings["SqlConnectionString"]);
+            var databaseType = ConfigurationManager.AppSettings["DbType"].ToString();
+            if (databaseType == "Postgres") {
+                dbType = DatabaseType.Postgres;
+            }
             InitializeDatabaseControls();   
         }      
 		        
@@ -142,7 +148,15 @@ namespace SqlStatementGenerator
 
                 cmbDatabases.DisplayMember = "DATABASE_NAME";
                 cmbDatabases.ValueMember = "DATABASE_NAME";
-                DataTable dt = DatabaseUtilities.GetDatabases(m_sSqlConnectionString);
+
+                DataTable dt = null;
+                if (this.dbType == DatabaseType.Sqlserver) {
+                    dt = DatabaseUtilities.GetDatabases(m_sSqlConnectionString);
+                }
+                else
+                {
+                    dt = DatabaseUtilitiesPostgres.GetDatabases(m_sSqlConnectionString);
+                }
                 cmbDatabases.DataSource = dt;
             }
             catch (Exception ex)

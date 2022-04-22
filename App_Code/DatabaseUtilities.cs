@@ -69,6 +69,39 @@ namespace SqlStatementGenerator
             return dt;
         }
 
+        public static DataTable GetDatabasesForPostgres(string sConnection)
+        {
+            SqlConnection connection = null;
+            DataTable dt = null;
+
+            try
+            {
+                connection = GetConnection(sConnection, string.Empty);
+                if (connection == null)
+                    return dt;
+
+                string sDbCommand = "SELECT name AS DATABASE_NAME, 0 AS DATABASE_SIZE, NULL AS REMARKS FROM master.dbo.sysdatabases WHERE HAS_DBACCESS(name) = 1  ORDER BY name";
+                DataSet dset = SqlHelper.ExecuteDataset(connection, CommandType.Text, sDbCommand);
+
+                if ((dset != null) && (dset.Tables.Count > 0))
+                    dt = dset.Tables[0];
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("GetDatabases error: " + ex.Message);
+            }
+            finally
+            {
+                if (connection != null)
+                {
+                    connection.Close();
+                    connection.Dispose();
+                }
+            }
+
+            return dt;
+        }
+
         public static DataTable GetDatabaseTables(string sConnection, string sDatabase)
         {
             SqlConnection connection = null;
