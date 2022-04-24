@@ -74,8 +74,16 @@ namespace SqlStatementGenerator
                 cmbTables.Items.Clear();
                 cmbTables.DisplayMember = "TABLE_NAME";
                 cmbTables.ValueMember = "TABLE_NAME";
+                DataTable dt = null;
+                if (this.dbType == DatabaseType.Sqlserver)
+                {
+                    dt = DatabaseUtilities.GetDatabaseTables(m_sSqlConnectionString, cmbDatabases.Text);
+                }
+                else
+                {
+                    dt = DatabaseUtilitiesPostgres.GetDatabaseTables(m_sSqlConnectionString, cmbDatabases.Text);
+                }
 
-                DataTable dt = DatabaseUtilities.GetDatabaseTables(m_sSqlConnectionString, cmbDatabases.Text);
                 cmbTables.DataSource = dt;
             }
             catch (Exception ex)
@@ -195,7 +203,16 @@ namespace SqlStatementGenerator
             {
                 Cursor.Current = Cursors.WaitCursor;
 
-                m_TableInfo = DatabaseUtilities.LoadDataTable(m_sSqlConnectionString, cmbDatabases.Text, sSQL);
+                if (this.dbType == DatabaseType.Sqlserver)
+                {
+                    m_TableInfo = DatabaseUtilities.LoadDataTable(m_sSqlConnectionString, cmbDatabases.Text, sSQL);
+                }
+                else
+                {
+                    m_TableInfo = DatabaseUtilitiesPostgres.LoadDataTable(m_sSqlConnectionString, cmbDatabases.Text, sSQL);
+                }
+
+                
                 dgTableInfo.DataSource = m_TableInfo;
 
                 // load the list of columns to include in the generator
