@@ -79,7 +79,7 @@ namespace SqlStatementGenerator
         {
             NpgsqlConnection connection = null;
             DataTable dt = null;
-            DataSet ds = null;
+            DataSet ds = new DataSet();
             try
             {
                 connection = GetConnection(sConnection, string.Empty);
@@ -115,23 +115,20 @@ namespace SqlStatementGenerator
         {
             NpgsqlConnection connection = null;
             DataTable dt = null;
-
+            DataSet ds = new DataSet();
             try
             {
                 connection = GetConnection(sConnection, sDatabase);
                 if (connection == null)
                     return dt;
+                string sqlString = @"select tablename as TABLE_NAME from pg_tables where schemaname = 'public';";
+                NpgsqlCommand cmd = new NpgsqlCommand(sqlString, connection);
 
-                NpgsqlCommand cmd = new NpgsqlCommand("sp_tables", connection);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.AddWithValue("@table_type", "'TABLE'");
-
-                DataSet dset = new DataSet();
                 NpgsqlDataAdapter da = new NpgsqlDataAdapter(cmd);
-                da.Fill(dset);
+                da.Fill(ds);
 
-                if ((dset != null) && (dset.Tables.Count > 0))
-                    dt = dset.Tables[0];
+                if ((ds != null) && (ds.Tables.Count > 0))
+                    dt = ds.Tables[0];
             }
             catch (Exception ex)
             {
@@ -153,7 +150,7 @@ namespace SqlStatementGenerator
         {
             NpgsqlConnection connection = null;
             DataTable dt = null;
-            DataSet ds = null;
+            DataSet ds = new DataSet();
             try
             {
                 connection = GetConnection(sConnection, sDatabase);
@@ -191,7 +188,7 @@ namespace SqlStatementGenerator
         {
             NpgsqlConnection connection = null;
             DataTable dt = null;
-            DataSet ds = null;
+            DataSet ds = new DataSet();
             try
             {
                 connection = GetConnection(sConnection, sDatabase);
