@@ -50,7 +50,7 @@ namespace SqlStatementGenerator
 
         private void btnGenerate_Click(object sender, System.EventArgs e)
         {						
-            GenerateSqlStatements();
+            GenerateSqlStatements(dbType);
 
             // if user cancelled or problem occured, just exit
             if (m_sSqlStatementText.Trim() == string.Empty)
@@ -237,7 +237,7 @@ namespace SqlStatementGenerator
         /// <summary>
         /// Generates sql statements based upon the generator type selected and the tableinfo provided
         /// </summary>
-        private void GenerateSqlStatements()
+        private void GenerateSqlStatements(DatabaseType dbType)
         {
             // clear the string member
             m_sSqlStatementText = string.Empty;
@@ -266,7 +266,7 @@ namespace SqlStatementGenerator
             // generate the sql by type
             if (cmbSqlType.SelectedIndex == (int)STATEMENT_TYPES.INSERT)
             {
-                m_sSqlStatementText = SqlScriptGenerator.GenerateSqlInserts(aryColumns, m_TableInfo, sTargetTableName);
+                m_sSqlStatementText = SqlScriptGenerator.GenerateSqlInserts(dbType, aryColumns, m_TableInfo, sTargetTableName);
             }
             else if (cmbSqlType.SelectedIndex == (int)STATEMENT_TYPES.UPDATE)
             {
@@ -292,11 +292,11 @@ namespace SqlStatementGenerator
                 aryWhereColumns.Clear();
                 aryWhereColumns = dlg.UserSelectedItems;
 
-                m_sSqlStatementText = SqlScriptGenerator.GenerateSqlUpdates(aryColumns, aryWhereColumns, m_TableInfo, sTargetTableName);
+                m_sSqlStatementText = SqlScriptGenerator.GenerateSqlUpdates(dbType, aryColumns, aryWhereColumns, m_TableInfo, sTargetTableName);
             }
             else if (cmbSqlType.SelectedIndex == (int)STATEMENT_TYPES.DELETE)
             {
-                m_sSqlStatementText = SqlScriptGenerator.GenerateSqlDeletes(aryColumns, m_TableInfo, sTargetTableName);
+                m_sSqlStatementText = SqlScriptGenerator.GenerateSqlDeletes(dbType, aryColumns, m_TableInfo, sTargetTableName);
             }            
         }
 

@@ -5,13 +5,23 @@ using System.Collections;
 using System.Data;
 using System.Collections.Generic;
 using System.Text;
+using SqlStatementGenerator.App_Code;
 
 namespace SqlStatementGenerator
 {
     public class SqlScriptGenerator
     {
-        public static string GenerateSqlInserts(ArrayList aryColumns, DataTable dtTable, string sTargetTableName)
+        private const string insertSqlServerTemplate = @"INSERT INTO [{0}]({1}) ";
+        private const string updateSqlServerTemplate = @"UPDATE [{0}] SET {1} WHERE {2};";
+        private const string deleteSqlServerTemplate = @"DELETE FROM [{0}] WHERE {1};";
+
+        private const string insertPostgresTemplate = @"INSERT INTO {0}({1}) ";
+        private const string updatePostgresTemplate = @"UPDATE {0} SET {1} WHERE {2};";
+        private const string deletePostgresTemplate = @"DELETE FROM {0} WHERE {1};";
+
+        public static string GenerateSqlInserts(DatabaseType type, ArrayList aryColumns, DataTable dtTable, string sTargetTableName)
         {
+
             string sSqlInserts = string.Empty;
             StringBuilder sbSqlStatements = new StringBuilder(string.Empty);
             StringBuilder sbColumns = new StringBuilder(string.Empty);
@@ -21,8 +31,15 @@ namespace SqlStatementGenerator
             {
                 if (sbColumns.ToString() != string.Empty)
                     sbColumns.Append(", ");
-
-                sbColumns.Append("[" + colname + "]");
+                if (type.Equals(DatabaseType.Sqlserver))
+                {
+                    sbColumns.Append("[" + colname + "]");
+                }
+                else if (type.Equals(DatabaseType.Postgres))
+                {
+                    sbColumns.Append("" + colname + "");
+                }
+                
             }
 
             // loop thru each record of the datatable
@@ -80,7 +97,9 @@ namespace SqlStatementGenerator
                 //   INSERT INTO Tabs(Name) 
                 //      VALUES('Referrals')
                 // write the insert line out to the stringbuilder
-                string snewsql = string.Format("INSERT INTO [{0}]({1}) ", sTargetTableName, sbColumns.ToString());
+                var template = type == DatabaseType.Sqlserver ? insertSqlServerTemplate : insertPostgresTemplate;
+
+                string snewsql = string.Format(template, sTargetTableName, sbColumns.ToString());
                 sbSqlStatements.Append(snewsql);
                 sbSqlStatements.AppendLine();
                 sbSqlStatements.Append('\t');
@@ -94,7 +113,7 @@ namespace SqlStatementGenerator
             return sSqlInserts;
         }
 
-        public static string GenerateSqlUpdates(ArrayList aryColumns, ArrayList aryWhereColumns, DataTable dtTable, string sTargetTableName)
+        public static string GenerateSqlUpdates(DatabaseType type, ArrayList aryColumns, ArrayList aryWhereColumns, DataTable dtTable, string sTargetTableName)
         {
             string sSqlUpdates = string.Empty;
             StringBuilder sbSqlStatements = new StringBuilder(string.Empty);
@@ -109,7 +128,14 @@ namespace SqlStatementGenerator
 
                 foreach (string col in aryColumns)
                 {
-                    StringBuilder sbNewValue = new StringBuilder("[" + col + "] = ");
+                    StringBuilder sbNewValue = new StringBuilder();
+                    if (type.Equals(DatabaseType.Sqlserver)) {
+                        sbNewValue.Append("[" + col + "] = ");
+                    }
+                    else if(type.Equals(DatabaseType.Postgres))
+                    {
+                        sbNewValue.Append("" + col + " = ");
+                    }
                     if (sbValues.ToString() != string.Empty)
                         sbValues.Append(", ");
 
@@ -161,7 +187,15 @@ namespace SqlStatementGenerator
                 StringBuilder sbWhereValues = new StringBuilder(string.Empty);       
                 foreach (string col in aryWhereColumns)
                 {
-                    StringBuilder sbNewValue = new StringBuilder("[" + col + "] = ");
+                    StringBuilder sbNewValue = new StringBuilder();
+                    if (type.Equals(DatabaseType.Sqlserver))
+                    {
+                        sbNewValue.Append("[" + col + "] = ");
+                    }
+                    else if (type.Equals(DatabaseType.Postgres))
+                    {
+                        sbNewValue.Append("" + col + " = ");
+                    }
                     if (sbWhereValues.ToString() != string.Empty)
                         sbWhereValues.Append(" AND ");    
 
@@ -211,7 +245,8 @@ namespace SqlStatementGenerator
 
                 // UPDATE table SET col1 = 3, col2 = 4 WHERE (select cols)
                 // write the line out to the stringbuilder
-                string snewsql = string.Format("UPDATE [{0}] SET {1} WHERE {2};", sTargetTableName, sbValues.ToString(), sbWhereValues.ToString());
+                var template = type == DatabaseType.Sqlserver ? updateSqlServerTemplate : updatePostgresTemplate;
+                string snewsql = string.Format(template, sTargetTableName, sbValues.ToString(), sbWhereValues.ToString());
                 sbSqlStatements.Append(snewsql);
                 sbSqlStatements.AppendLine();
                 sbSqlStatements.AppendLine();
@@ -221,7 +256,7 @@ namespace SqlStatementGenerator
             return sSqlUpdates;
         }
 
-        public static string GenerateSqlDeletes(ArrayList aryColumns, DataTable dtTable, string sTargetTableName)
+        public static string GenerateSqlDeletes(DatabaseType type, ArrayList aryColumns, DataTable dtTable, string sTargetTableName)
         {
             string sSqlDeletes = string.Empty;
             StringBuilder sbSqlStatements = new StringBuilder(string.Empty);
@@ -232,8 +267,16 @@ namespace SqlStatementGenerator
                 // loop thru each column, and include the value if the column is in the array
                 StringBuilder sbValues = new StringBuilder(string.Empty);                
                 foreach (string col in aryColumns)
-                {                    
-                    StringBuilder sbNewValue = new StringBuilder("[" + col + "] = ");
+                {
+                    StringBuilder sbNewValue = new StringBuilder();
+                    if (type.Equals(DatabaseType.Sqlserver))
+                    {
+                        sbNewValue.Append("[" + col + "] = ");
+                    }
+                    else if (type.Equals(DatabaseType.Postgres))
+                    {
+                        sbNewValue.Append("" + col + " = ");
+                    }
 
                     if (sbValues.ToString() != string.Empty)
                         sbValues.Append(" AND ");    
@@ -280,7 +323,9 @@ namespace SqlStatementGenerator
 
                 // DELETE FROM table WHERE col1 = 3 AND col2 = '4'
                 // write the line out to the stringbuilder
-                string snewsql = string.Format("DELETE FROM [{0}] WHERE {1};", sTargetTableName, sbValues.ToString());
+                var template = type == DatabaseType.Sqlserver ? deleteSqlServerTemplate : deletePostgresTemplate;
+
+                string snewsql = string.Format(template, sTargetTableName, sbValues.ToString());
                 sbSqlStatements.Append(snewsql);
                 sbSqlStatements.AppendLine();
                 sbSqlStatements.AppendLine();
